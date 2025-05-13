@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Faturas de Fornecedores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+    <h2>Faturas de Fornecedores</h2>
+    <p>Bem-vindo, {{ session['usuario'] }}! <a href="{{ url_for('auth.logout') }}">Sair</a></p>
+    <form class="row g-3 mb-4" method="get">
+        <div class="col-md-3">
+            <input class="form-control" type="text" name="fornecedor" placeholder="Fornecedor" value="{{ request.args.get('fornecedor', '') }}">
+        </div>
+        <div class="col-md-3">
+            <select class="form-select" name="status">
+                <option value="">Status</option>
+                <option value="Pago" {% if request.args.get('status') == 'Pago' %}selected{% endif %}>Pago</option>
+                <option value="Pendente" {% if request.args.get('status') == 'Pendente' %}selected{% endif %}>Pendente</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input class="form-control" type="month" name="mes_ano" value="{{ request.args.get('mes_ano', '') }}">
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary" type="submit">Filtrar</button>
+            <a class="btn btn-secondary" href="/">Limpar</a>
+        </div>
+    </form>
+
+    <a class="btn btn-success mb-3" href="/nova">Nova Fatura</a>
+    <a class="btn btn-outline-info mb-3" href="/exportar">Exportar para Excel</a>
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Fornecedor</th><th>Serviço</th><th>Mês/Ano</th><th>Valor</th><th>Recebimento</th><th>Status</th><th>Anexo</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for f in faturas %}
+        <tr>
+            <td>{{ f[1] }}</td>
+            <td>{{ f[2] }}</td>
+            <td>{{ f[3] }}</td>
+            <td>R$ {{ "%.2f"|format(f[4]) }}</td>
+            <td>{{ f[5] }}</td>
+            <td>{{ f[6] }}</td>
+            <td>
+                {% if f[7] %}
+                    <a href="{{ url_for('download_file', filename=f[7]) }}" class="btn btn-sm btn-outline-primary">Baixar</a>
+                {% else %}
+                    —
+                {% endif %}
+            </td>
+        <td>
+                {% if f[7] %}
+                    <a href="{{ url_for('download_file', filename=f[7]) }}" class="btn btn-sm btn-outline-primary">Baixar</a>
+                {% else %}
+                    —
+                {% endif %}
+                    <a href="/editar/{{ f[0] }}" class="btn btn-sm btn-warning">Editar</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
